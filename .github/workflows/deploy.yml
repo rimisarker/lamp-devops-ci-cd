@@ -1,0 +1,21 @@
+name: CI/CD for LAMP App
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build Docker image
+        run: |
+          cd docker
+          docker build -t my-lamp-app .
+
+      - name: Run Docker container
+        run: |
+          docker run -d -p 8080:80 my-lamp-app
