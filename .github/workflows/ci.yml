@@ -1,0 +1,40 @@
+name: CI for LAMP CRUD App
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: rootpass
+          MYSQL_DATABASE: myapp
+          MYSQL_USER: myuser
+          MYSQL_PASSWORD: mypass
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Docker
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build and run Docker Compose
+      run: |
+        docker-compose -f docker/docker-compose.yml up -d --build
+
+    - name: Verify containers
+      run: docker ps -a
