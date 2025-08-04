@@ -1,18 +1,26 @@
-- name: LAMP Stack Setup
+- name: Deploy LAMP with MySQL using Docker
   hosts: all
   become: yes
+
   tasks:
-    - name: Install Apache and PHP
+    - name: Install Docker
       apt:
-        name:
-          - apache2
-          - php
-          - libapache2-mod-php
+        name: docker.io
         state: present
         update_cache: yes
 
-    - name: Ensure Apache is running
-      service:
-        name: apache2
-        state: started
-        enabled: yes
+    - name: Install Docker Compose
+      apt:
+        name: docker-compose
+        state: present
+
+    - name: Copy project files
+      copy:
+        src: /home/vboxuser/Desktop/lamp-devops-ci-cd/
+        dest: /home/vboxuser/app/
+        remote_src: no
+
+    - name: Run Docker Compose
+      command: docker-compose up -d --build
+      args:
+        chdir: /home/vboxuser/app/
